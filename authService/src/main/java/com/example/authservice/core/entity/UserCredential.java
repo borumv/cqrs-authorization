@@ -25,7 +25,10 @@ public class UserCredential implements UserDetails {
     private String firstName;
     private String nickName;
     private String password;
+    @Enumerated(EnumType.STRING)
     private Role role;
+    @Enumerated(EnumType.STRING)
+    private RegistryStatus status;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

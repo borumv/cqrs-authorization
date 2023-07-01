@@ -1,8 +1,8 @@
 package com.example.authservice.command.rest;
 
-import com.example.authservice.command.CreateUserRestModel;
 import com.example.authservice.command.rest.service.RegisterUserService;
 import com.example.authservice.core.dto.AuthenticationResponse;
+import com.example.authservice.core.entity.AuthenticateInformation;
 import com.example.authservice.core.repository.UserCredentialRepository;
 import jakarta.validation.Valid;
 import org.springframework.core.env.Environment;
@@ -15,16 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 public class UserCommandController {
-    final Environment env;
     private final RegisterUserService registerUserService;
 
-    public UserCommandController(Environment env, RegisterUserService registerUserService, UserCredentialRepository userCredentialRepository) {
-        this.env = env;
-        this.registerUserService = registerUserService;
+    public UserCommandController(RegisterUserService registerUserService) {
+       this.registerUserService = registerUserService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> createProfile(@RequestBody @Valid CreateUserRestModel registerUserRestModel) throws InterruptedException {
+    public ResponseEntity<AuthenticateInformation> createProfile(@RequestBody @Valid CreateUserRestModel registerUserRestModel) throws InterruptedException {
+
         return ResponseEntity.ok(registerUserService.register(registerUserRestModel));
     }
 }

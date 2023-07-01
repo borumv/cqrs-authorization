@@ -1,4 +1,4 @@
-package com.example.authservice.command;
+package com.example.authservice.command.commands;
 
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +12,9 @@ public class RegisterUserCommand {
     @TargetAggregateIdentifier
     private String userId;
     private String email;
+    private String password;
     private String nickName;
     private String firstName;
     private String lastName;
-    private String password;
     private LocalDate dateOfRegistry;
 }

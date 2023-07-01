@@ -1,11 +1,12 @@
 package com.example.authservice.query;
 
 
-import com.example.authservice.core.entity.Role;
+import com.example.authservice.core.entity.RegistryStatus;
 import com.example.authservice.core.entity.UserCredential;
+import com.example.authservice.core.events.UserRegisteredApproveEvent;
 import com.example.authservice.core.events.UserRegisteredEvent;
 import com.example.authservice.core.repository.UserCredentialRepository;
-import com.example.core.events.UserRegistrationCancelEvent;
+import com.example.core.events.UserRegistrationCanceledEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
@@ -19,30 +20,28 @@ public class UserRegisterEventHandler {
 
     private final UserCredentialRepository userRepository;
 
-
     public UserRegisterEventHandler(UserCredentialRepository profileRepository) {
         this.userRepository = profileRepository;
     }
-
-//    @ExceptionHandler(resultType = Exception.class)
-//    public void handle(Exception ex) throws Exception {
-//        throw ex;
-//    }
-//    @ExceptionHandler(resultType = IllegalArgumentException.class)
-//    public void handle(IllegalArgumentException ex){
-//        //ToDo
-//    }
-//    @EventHandler
-//    public void on(UserRegisteredEvent userRegisteredEvent) throws Exception {
-//        UserCredential profileEntity = new UserCredential();
-//        BeanUtils.copyProperties(userRegisteredEvent, profileEntity);
-//        profileEntity.setRole(Role.USER);
-//        userRepository.save(profileEntity);
-//    }
+    @EventHandler
+    public void on(UserRegisteredEvent userRegisteredEvent) {
+        log.info("UserRegisteredEvent with userId - " + userRegisteredEvent.getUserId() + ". We were delete it");
+        UserCredential user = new UserCredential();
+        BeanUtils.copyProperties(userRegisteredEvent, user);
+        userRepository.save(user);
+    }
 
     @EventHandler
-    public void on(UserRegistrationCancelEvent userRegistrationCancelEvent) throws Exception {
-        log.info("UserRegistrationCancelEvent with userId - " + userRegistrationCancelEvent.getUserId());
-        userRepository.deleteById(userRegistrationCancelEvent.getUserId());
+    public void on(UserRegistrationCanceledEvent userRegistrationCanceledEvent) {
+        log.info("UserRegistrationCancelEvent with userId - " + userRegistrationCanceledEvent.getUserId() + ". We were delete it");
+        userRepository.deleteById(userRegistrationCanceledEvent.getUserId());
+    }
+
+    @EventHandler
+    public void on(UserRegisteredApproveEvent userRegisteredApproveEvent) {
+        log.info("UserRegisteredApproveEvent with userId - " + userRegisteredApproveEvent.getUserId());
+        var user = userRepository.findById(userRegisteredApproveEvent.getUserId()).orElseThrow();
+        user.setStatus(userRegisteredApproveEvent.getRegistryStatus());
+        userRepository.save(user);
     }
 }

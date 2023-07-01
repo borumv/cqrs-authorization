@@ -6,9 +6,8 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Data
 @Builder
-public class CancelUserRegistrationCommand {
+public class UserRegistrationCancelCommand {
     @TargetAggregateIdentifier
-    private final String id;
     private final String userId;
     private final String reason;
 }

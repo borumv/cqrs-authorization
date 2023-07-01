@@ -1,8 +1,5 @@
 package com.example.authservice;
 
-import com.example.authservice.command.interceptors.RegisterUserCommandInterceptor;
-import org.axonframework.commandhandling.CommandBus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -19,10 +16,10 @@ public class AuthServiceApplication {
         SpringApplication.run(AuthServiceApplication.class, args);
     }
 
-    @Autowired
-    public void registerCreateProductCommandInterceptor(ApplicationContext context,
-                                                        CommandBus commandBus){
-        commandBus.registerDispatchInterceptor(context.getBean(RegisterUserCommandInterceptor.class));
-    }
+//    @Autowired
+//    public void registerCreateProductCommandInterceptor(ApplicationContext context,
+//                                                        CommandBus commandBus){
+//        commandBus.registerDispatchInterceptor(context.getBean(RegisterUserCommandInterceptor.class));
+//    }
 
 }

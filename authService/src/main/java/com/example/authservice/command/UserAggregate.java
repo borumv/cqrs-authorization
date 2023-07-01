@@ -1,8 +1,12 @@
 package com.example.authservice.command;
 
+import com.example.authservice.command.commands.ApproveRegisterUserCommand;
+import com.example.authservice.command.commands.RegisterUserCommand;
+import com.example.authservice.core.entity.RegistryStatus;
+import com.example.authservice.core.events.UserRegisteredApproveEvent;
 import com.example.authservice.core.events.UserRegisteredEvent;
-import com.example.core.commands.CancelUserRegistrationCommand;
-import com.example.core.events.UserRegistrationCancelEvent;
+import com.example.core.commands.UserRegistrationCancelCommand;
+import com.example.core.events.UserRegistrationCanceledEvent;
 import lombok.Data;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -18,12 +22,12 @@ import java.time.LocalDate;
 public class UserAggregate {
     @AggregateIdentifier
     private String userId;
-    private String email;
     private String nickName;
+    private String email;
     private String firstName;
     private String lastName;
-    private String password;
     private LocalDate dateOfRegistry;
+    private RegistryStatus registryStatus;
 
     // Default constructor required by Axon
     public UserAggregate() {
@@ -32,40 +36,53 @@ public class UserAggregate {
     @CommandHandler
     public UserAggregate(RegisterUserCommand registerUserCommand) {
         UserRegisteredEvent userRegisterEvent = UserRegisteredEvent.builder()
-                .userId(registerUserCommand.getUserId())
                 .email(registerUserCommand.getEmail())
+                .userId(registerUserCommand.getUserId())
                 .nickName(registerUserCommand.getNickName())
                 .firstName(registerUserCommand.getFirstName())
                 .lastName(registerUserCommand.getLastName())
-                .password(registerUserCommand.getPassword())
                 .dateOfRegistry(registerUserCommand.getDateOfRegistry())
+                .registryStatus(RegistryStatus.WAITING)
                 .build();
         BeanUtils.copyProperties(registerUserCommand, userRegisterEvent);
         AggregateLifecycle.apply(userRegisterEvent);
     }
 
     @CommandHandler
-    public void handle(CancelUserRegistrationCommand command){
-        UserRegistrationCancelEvent userRegistrationCancelEvent = UserRegistrationCancelEvent.builder()
+    public void handle(UserRegistrationCancelCommand command) {
+        UserRegistrationCanceledEvent userRegistrationCanceledEvent = UserRegistrationCanceledEvent.builder()
                 .userId(command.getUserId())
                 .reason(command.getReason())
                 .build();
-        AggregateLifecycle.apply(userRegistrationCancelEvent);
+        AggregateLifecycle.apply(userRegistrationCanceledEvent);
     }
 
-//    @EventSourcingHandler - do we need?
-//    public void on(UserRegistrationCancelEvent userRegistrationCancelEvent){}
-
+    @CommandHandler
+    public void handle(ApproveRegisterUserCommand approveRegisterUserCommand) {
+        UserRegisteredApproveEvent userRegisteredApproveEvent = new UserRegisteredApproveEvent(
+                approveRegisterUserCommand.getUserId()
+        );
+        AggregateLifecycle.apply(userRegisteredApproveEvent);
+    }
 
     @EventSourcingHandler
+    protected void on(UserRegisteredApproveEvent userRegisteredApproveEvent) {
+        this.registryStatus = userRegisteredApproveEvent.getRegistryStatus();
+    }
+
+    @EventSourcingHandler
+    protected void on(UserRegistrationCanceledEvent userRegistrationCanceledEvent){
+        AggregateLifecycle.markDeleted();
+    }
+    @EventSourcingHandler
     public void on(UserRegisteredEvent event) {
-        this.userId = event.getUserId();
         this.email = event.getEmail();
+        this.userId = event.getUserId();
         this.nickName = event.getNickName();
         this.firstName = event.getFirstName();
         this.lastName = event.getLastName();
-        this.password = event.getPassword();
         this.dateOfRegistry = event.getDateOfRegistry();
+        this.registryStatus = event.getRegistryStatus();
     }
 
 }

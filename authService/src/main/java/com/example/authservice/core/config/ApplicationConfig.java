@@ -1,6 +1,8 @@
 package com.example.authservice.core.config;
 
 import com.example.authservice.core.repository.UserCredentialRepository;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,5 +43,13 @@ public class ApplicationConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public XStream xStream() {
+        XStream xStream = new XStream();
+        xStream.addPermission(AnyTypePermission.ANY);
+
+        return xStream;
     }
 }

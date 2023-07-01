@@ -22,23 +22,15 @@ public class ProfileEventHandler {
         this.profileRepository = profileRepository;
     }
 
-    @ExceptionHandler(resultType = Exception.class)
-    public void handle(Exception ex) throws Exception {
-        throw ex;
-    }
-    @ExceptionHandler(resultType = IllegalArgumentException.class)
-    public void handle(IllegalArgumentException ex){
-        //ToDo
-    }
     @EventHandler
-    public void on(ProfileCreatedEvent profileCreatedEvent) throws Exception {
+    public void on(ProfileCreatedEvent profileCreatedEvent){
         ProfileEntity profileEntity = new ProfileEntity();
         BeanUtils.copyProperties(profileCreatedEvent, profileEntity);
         profileRepository.save(profileEntity);
     }
 
     @EventHandler
-    public void on(ProfileReservedEvent profileReservedEvent) throws Exception {
+    public void on(ProfileReservedEvent profileReservedEvent) {
         ProfileEntity profileEntity = new ProfileEntity();
         BeanUtils.copyProperties(profileReservedEvent, profileEntity);
         System.out.println();

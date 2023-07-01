@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 @Builder
-public class ReserveProfileCommand {
+public class ProfileReserveCommand {
     @TargetAggregateIdentifier
     private final String userId;
     private final String nickName;

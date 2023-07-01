@@ -1,6 +1,6 @@
 package com.example.profilesservice.command;
 
-import com.example.core.commands.ReserveProfileCommand;
+import com.example.core.commands.ProfileReserveCommand;
 import com.example.core.events.ProfileReservedEvent;
 import com.example.profilesservice.core.events.ProfileCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class ProfileAggregate {
     }
 
     @CommandHandler
-    public ProfileAggregate(CreateProfileCommand createProfileCommand) throws Exception {
+    public ProfileAggregate(CreateProfileCommand createProfileCommand) {
         // Validate CreateProfile Command
         if (createProfileCommand.getUserId() == null) {
             throw new IllegalArgumentException("User ID cannot be null");
@@ -44,23 +44,23 @@ public class ProfileAggregate {
     }
 
     @CommandHandler
-    public ProfileAggregate(ReserveProfileCommand reserveProfileCommand){
-        if (reserveProfileCommand.getUserId() == null) {
+    public ProfileAggregate(ProfileReserveCommand profileReserveCommand){
+        if (profileReserveCommand.getUserId() == null) {
             throw new IllegalArgumentException("ReserveProfileCommand. User ID cannot be null");
         }
-        log.info("ReserveProfileCommand accepted with id - " + reserveProfileCommand.getUserId());
+        log.info("ReserveProfileCommand accepted with id - " + profileReserveCommand.getUserId());
         ProfileReservedEvent profileReservedEvent = ProfileReservedEvent.builder()
                 .id(UUID.randomUUID().toString())
-                .userId(reserveProfileCommand.getUserId())
-                .firstName(reserveProfileCommand.getFirstName())
-                .lastName(reserveProfileCommand.getLastName())
-                .nickName(reserveProfileCommand.getNickName())
-                .dateOfRegistry(reserveProfileCommand.getDateOfRegistry())
+                .userId(profileReserveCommand.getUserId())
+                .firstName(profileReserveCommand.getFirstName())
+                .lastName(profileReserveCommand.getLastName())
+                .nickName(profileReserveCommand.getNickName())
+                .dateOfRegistry(profileReserveCommand.getDateOfRegistry())
                 .build();
-        throw new RuntimeException("Test exception");
-//        log.info("Profile reservedEvent was done. Profile id - " + profileReservedEvent.getUserId());
-//        AggregateLifecycle.apply(profileReservedEvent);
-//        log.info("Profile reservedEvent was sent. Profile id - " + profileReservedEvent.getUserId());
+     //  throw new IllegalStateException("Test exception");
+        log.info("Profile reservedEvent was done. Profile id - " + profileReservedEvent.getUserId());
+        AggregateLifecycle.apply(profileReservedEvent);
+        log.info("Profile reservedEvent was sent. Profile id - " + profileReservedEvent.getUserId());
     }
 
 
